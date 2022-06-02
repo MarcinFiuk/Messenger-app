@@ -6,11 +6,14 @@ import { friends } from './friends';
 import { conversationsHistory } from './conversationsHistory';
 
 function App() {
-    const [conversation, setConversation] = useState(null);
+    const [allMessages, setAllMessages] = useState(conversationsHistory);
+    const [activeUser, setActiveUser] = useState(0);
     const [discussion, setDiscussion] = useState('');
 
-    const activeUserHandler = (id) => {
-        setConversation(conversationsHistory[id - 1]);
+    const conversation = allMessages[activeUser];
+
+    const activeUserHandler = (index) => {
+        setActiveUser(index);
     };
 
     const newMessageHandle = (e) => {
@@ -29,21 +32,10 @@ function App() {
             ],
         };
 
-        setConversation(newConversationHistory);
+        const newConversation = [...allMessages];
+        newConversation[activeUser] = newConversationHistory;
 
-        // setConversation((prevChat) => {
-        //     console.log(conversationsHistory[0]);
-        //     return {
-        //         ...prevChat,
-        //         messages: [
-        //             ...prevChat.messages,
-        //             {
-        //                 who: 'Marcin',
-        //                 what: messageToAdd,
-        //             },
-        //         ],
-        //     };
-        // });
+        setAllMessages(newConversation);
     };
 
     useEffect(() => {
@@ -57,17 +49,14 @@ function App() {
                     </div>
                 );
             });
-
+            console.log(discussion);
             setDiscussion(discussion);
         }
     }, [conversation]);
 
-    const friendsToDisplay = friends.map((friend) => {
+    const friendsToDisplay = friends.map((friend, index) => {
         return (
-            <button
-                key={friend.id}
-                onClick={() => activeUserHandler(friend.id)}
-            >
+            <button key={friend.id} onClick={() => activeUserHandler(index)}>
                 <img src={friend.photo} alt='user' />
                 <p>{friend.name}</p>
             </button>
