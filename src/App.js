@@ -1,14 +1,15 @@
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
 
-import { friends } from './friends';
-
+import Friend from './components/Friend';
 import { conversationsHistory } from './conversationsHistory';
+import useFetch from './hooks/useFetch';
 
 function App() {
     const [allMessages, setAllMessages] = useState(conversationsHistory);
     const [activeUser, setActiveUser] = useState(0);
     const [discussion, setDiscussion] = useState('');
+    const chatUsers = useFetch('users');
 
     const conversation = allMessages[activeUser];
 
@@ -49,17 +50,19 @@ function App() {
                     </div>
                 );
             });
-            console.log(discussion);
             setDiscussion(discussion);
         }
     }, [conversation]);
 
-    const friendsToDisplay = friends.map((friend, index) => {
+    const friendsToDisplay = chatUsers.map((user, index) => {
+        const { id } = user;
         return (
-            <button key={friend.id} onClick={() => activeUserHandler(index)}>
-                <img src={friend.photo} alt='user' />
-                <p>{friend.name}</p>
-            </button>
+            <Friend
+                friend={user}
+                index={index}
+                key={id}
+                onClick={() => activeUserHandler(index)}
+            />
         );
     });
 
@@ -79,16 +82,14 @@ function App() {
 const Wrapper = styled.div`
     display: grid;
     grid-template-columns: 1fr 5fr;
+    background-color: #434343;
 `;
 
 const FriendsContainer = styled.div`
-    button {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        justify-content: center;
-        align-items: center;
-    }
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 `;
 
 const CommunicationWindow = styled.div``;
