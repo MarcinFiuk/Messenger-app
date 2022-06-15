@@ -26,6 +26,7 @@ const Button = styled.button`
     }
 
     &:hover {
+        background-color: #d3d3d3;
     }
 `;
 

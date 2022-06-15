@@ -1,80 +1,51 @@
 import styled from 'styled-components';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-import Friend from './components/Friend';
-import { conversationsHistory } from './conversationsHistory';
+import Friends from './components/Friends';
+import ChatWindow from './components/ChatWindow';
 import useFetch from './hooks/useFetch';
 
 function App() {
-    const [allMessages, setAllMessages] = useState(conversationsHistory);
-    const [activeUser, setActiveUser] = useState(0);
-    const [discussion, setDiscussion] = useState('');
+    const [activeUser, setActiveUser] = useState('Marcin');
+    const [conversationPartner, setConversationPartner] = useState('');
     const chatUsers = useFetch('users');
 
-    const conversation = allMessages[activeUser];
+    // const queryValue = getQuerySearch(activeUser, conversationPartner);
+    // console.log(queryValue);
+    // const conversationCode = useFetch('chatId', 'users', '==', queryValue);
 
-    const activeUserHandler = (index) => {
-        setActiveUser(index);
+    // console.log(conversationCode);
+
+    const getConversationPartner = (name) => {
+        setConversationPartner(name);
     };
 
-    const newMessageHandle = (e) => {
-        e.preventDefault();
-        if (!conversation) return;
-        const messageToAdd = e.currentTarget.elements.message.value;
-
-        const newConversationHistory = {
-            ...conversation,
-            messages: [
-                ...conversation.messages,
-                {
-                    who: 'Marcin',
-                    what: messageToAdd,
-                },
-            ],
-        };
-
-        const newConversation = [...allMessages];
-        newConversation[activeUser] = newConversationHistory;
-
-        setAllMessages(newConversation);
-    };
-
-    useEffect(() => {
-        if (conversation && conversation.messages?.length > 0) {
-            const discussion = conversation.messages.map((el, i) => {
-                const { who, what } = el;
-                return (
-                    <div key={i}>
-                        <div>{who}</div>
-                        <p>{what}</p>
-                    </div>
-                );
-            });
-            setDiscussion(discussion);
-        }
-    }, [conversation]);
-
-    const friendsToDisplay = chatUsers.map((user, index) => {
-        const { id } = user;
-        return (
-            <Friend
-                friend={user}
-                index={index}
-                key={id}
-                onClick={() => activeUserHandler(index)}
-            />
-        );
-    });
+    // useEffect(() => {
+    //     if (conversation && conversation.messages?.length > 0) {
+    //         const discussion = conversation.messages.map((el, i) => {
+    //             const { who, what } = el;
+    //             return (
+    //                 <div key={i}>
+    //                     <div>{who}</div>
+    //                     <p>{what}</p>
+    //                 </div>
+    //             );
+    //         });
+    //         setDiscussion(discussion);
+    //     }
+    // }, [conversation]);
 
     return (
         <Wrapper>
-            <FriendsContainer>{friendsToDisplay}</FriendsContainer>
-            <CommunicationWindow>
-                <MessageWindow>{discussion}</MessageWindow>
-                <form onSubmit={newMessageHandle}>
-                    <MessageInput type='text' name='message'></MessageInput>
-                </form>
-            </CommunicationWindow>
+            <Friends
+                users={chatUsers}
+                getConversationPartner={getConversationPartner}
+                activeUser={activeUser}
+            />
+            <ChatWindow
+                conversationPartner={conversationPartner}
+                activeUser={activeUser}
+            />
         </Wrapper>
     );
 }
@@ -83,23 +54,7 @@ const Wrapper = styled.div`
     display: grid;
     grid-template-columns: 1fr 5fr;
     background-color: #434343;
+    margin: 0;
 `;
-
-const FriendsContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-`;
-
-const CommunicationWindow = styled.div``;
-
-const MessageWindow = styled.div`
-    width: 100%;
-    min-height: 90%;
-    background-color: #c2c2c2;
-`;
-
-const MessageInput = styled.input``;
 
 export default App;
